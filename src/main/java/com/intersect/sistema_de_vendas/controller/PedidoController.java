@@ -1,8 +1,12 @@
 package com.intersect.sistema_de_vendas.controller;
 
 import com.intersect.sistema_de_vendas.model.ItemPedido;
+import com.intersect.sistema_de_vendas.model.ItemPedidoDTO;
 import com.intersect.sistema_de_vendas.model.Pedido;
+import com.intersect.sistema_de_vendas.model.Produto;
+import com.intersect.sistema_de_vendas.repository.ItemPedidoRepository;
 import com.intersect.sistema_de_vendas.repository.PedidoRepository;
+import com.intersect.sistema_de_vendas.repository.ProdutoRepository;
 import com.intersect.sistema_de_vendas.service.ItemPedidoService;
 import com.intersect.sistema_de_vendas.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,9 @@ public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private ProdutoRepository produtoRepository;
 
     @GetMapping
     public List<Pedido> listarPedidos() {
@@ -42,4 +49,22 @@ public class PedidoController {
         }
     }
 
+    @PostMapping("/{pedidoId}/itens/adicionar")
+    public ResponseEntity<ItemPedido> adicionarItem(@PathVariable Long pedidoId, @RequestBody ItemPedidoDTO itemPedidoDTO) {
+        // Busca o pedido pelo ID
+        Pedido pedido = pedidoService.buscarPedidoPorId(pedidoId)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        // Busca o produto pelo ID
+        Produto produto = produtoRepository.findById(itemPedidoDTO.getProdutoId())
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        // Cria o ItemPedido
+        ItemPedido itemPedido = new ItemPedido(produto, pedido, itemPedidoDTO.getQuantidade(), itemPedidoDTO.getPreco());
+
+        // Salva o ItemPedido
+        ItemPedido novoItemPedido = itemPedidoService.salvar(itemPedido);
+
+        return ResponseEntity.ok(novoItemPedido);
+    }
 }

@@ -23,8 +23,5 @@ public class ItemPedidoService {
         return itemPedidoRepository.findAll();
     }
 
-    public ItemPedido buscarPedidoPorId(Long id) {
-        return itemPedidoRepository.findById(id).get();
-    }
 
 }
