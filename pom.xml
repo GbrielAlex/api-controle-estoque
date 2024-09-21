@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.intersect</groupId>
-	<artifactId>sistema-de-vendas</artifactId>
+	<artifactId>Sistema-de-vendas</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>sistema-de-vendas</name>
 	<description>Demo project for Spring Boot</description>

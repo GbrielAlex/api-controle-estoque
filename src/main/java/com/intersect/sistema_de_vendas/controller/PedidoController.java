@@ -4,11 +4,9 @@ import com.intersect.sistema_de_vendas.model.ItemPedido;
 import com.intersect.sistema_de_vendas.model.ItemPedidoDTO;
 import com.intersect.sistema_de_vendas.model.Pedido;
 import com.intersect.sistema_de_vendas.model.Produto;
-import com.intersect.sistema_de_vendas.repository.ItemPedidoRepository;
-import com.intersect.sistema_de_vendas.repository.PedidoRepository;
-import com.intersect.sistema_de_vendas.repository.ProdutoRepository;
 import com.intersect.sistema_de_vendas.service.ItemPedidoService;
 import com.intersect.sistema_de_vendas.service.PedidoService;
+import com.intersect.sistema_de_vendas.service.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +25,7 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private ProdutoService produtoService;
 
     @GetMapping
     public List<Pedido> listarPedidos() {
@@ -41,23 +39,18 @@ public class PedidoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> getPedidoById(@PathVariable Long id) {
-        Optional<Pedido> pedido = pedidoService.buscarPedidoPorId(id);
-        if (pedido.isPresent()) {
-            return ResponseEntity.ok(pedido.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        Pedido pedido = pedidoService.buscarPedidoPorId(id);
+        return ResponseEntity.ok(pedido);
     }
 
     @PostMapping("/{pedidoId}/itens/adicionar")
     public ResponseEntity<ItemPedido> adicionarItem(@PathVariable Long pedidoId, @RequestBody ItemPedidoDTO itemPedidoDTO) {
+
         // Busca o pedido pelo ID
-        Pedido pedido = pedidoService.buscarPedidoPorId(pedidoId)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+        Pedido pedido = pedidoService.buscarPedidoPorId(pedidoId);
 
         // Busca o produto pelo ID
-        Produto produto = produtoRepository.findById(itemPedidoDTO.getProdutoId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        Produto produto = produtoService.buscarProdutoPorId(pedidoId);
 
         // Cria o ItemPedido
         ItemPedido itemPedido = new ItemPedido(produto, pedido, itemPedidoDTO.getQuantidade(), itemPedidoDTO.getPreco());
